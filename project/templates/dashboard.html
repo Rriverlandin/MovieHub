@@ -1,0 +1,154 @@
+{% extends "layout.html" %}
+
+{% block title %}MovieHub — Dashboard{% endblock %}
+
+{% block content %}
+<div class="mh-page">
+
+  <header class="mh-header">
+    <div>
+      <div class="mh-brand">
+        <span class="mh-brand-icon">🎬</span>
+        <h1>Movıe<span class="mh-accent">Hub</span></h1>
+      </div>
+      <p class="mh-welcome">Welcome, {{ user.username }} 👋</p>
+    </div>
+    <div class="mh-header-actions">
+      <button id="addMovieBtn" class="mh-add-btn" type="button">+ Add Movie</button>
+      <div class="mh-search">
+        🔍
+        <input id="searchInput" type="text" placeholder="Search title or genre">
+      </div>
+    </div>
+  </header>
+
+  <section class="mh-tickets">
+    <div class="mh-ticket">
+      <span class="mh-ticket-value">{{ user.total_movies }}</span>
+      <span class="mh-ticket-label">Movies</span>
+    </div>
+    <div class="mh-ticket">
+      <span class="mh-ticket-value">{{ user.watched_count }}</span>
+      <span class="mh-ticket-label">Watched</span>
+    </div>
+    <div class="mh-ticket">
+      <span class="mh-ticket-value">{{ user.favorite_count }}</span>
+      <span class="mh-ticket-label">Favorites</span>
+    </div>
+  </section>
+
+  <h2 class="mh-section-title">🎞️ Movie Collection</h2>
+
+  <main id="movieGrid" class="mh-grid">
+    {% for movie in user.movies %}
+    <div class="movie-card" data-title="{{ movie.title|lower }}" data-genre="{{ (movie.genre or '')|lower }}"
+         style="animation-delay: {{ loop.index0 * 0.04 }}s">
+      <div class="mh-poster">
+        <span>{{ movie.poster or "🎬" }}</span>
+        {% if movie.favorite %}<span class="mh-fav-badge">❤️</span>{% endif %}
+      </div>
+      <div class="mh-perf" aria-hidden="true">
+        {% for _ in range(10) %}<span></span>{% endfor %}
+      </div>
+      <div class="mh-card-body">
+        <h3>{{ movie.title }}</h3>
+        <p class="mh-meta">{{ movie.year or "—" }}{% if movie.genre %} · {{ movie.genre }}{% endif %}</p>
+        <div class="mh-rating">⭐ <span>{{ movie.rating }}/10</span></div>
+
+        <div class="mh-toggles">
+          <form action="{{ url_for('toggle_favorite', movie_id=movie.id) }}" method="post">
+            <button type="submit" class="mh-chip {{ 'is-on mh-chip-fav' if movie.favorite }}">
+              {{ '❤️' if movie.favorite else '🤍' }} Favorite
+            </button>
+          </form>
+          <form action="{{ url_for('toggle_watched', movie_id=movie.id) }}" method="post">
+            <button type="submit" class="mh-chip {{ 'is-on mh-chip-watched' if movie.watched }}">
+              ✔ Watched
+            </button>
+          </form>
+        </div>
+
+        <div class="mh-actions">
+          <button type="button" class="edit-btn"
+                  data-id="{{ movie.id }}"
+                  data-title="{{ movie.title }}"
+                  data-year="{{ movie.year or '' }}"
+                  data-genre="{{ movie.genre or '' }}"
+                  data-rating="{{ movie.rating }}"
+                  data-poster="{{ movie.poster or '🎬' }}"
+                  data-favorite="{{ movie.favorite|lower }}"
+                  data-watched="{{ movie.watched|lower }}">
+            ✎ Edit
+          </button>
+          <form action="{{ url_for('delete_movie', movie_id=movie.id) }}" method="post"
+                onsubmit="return confirm('Are you sure you want to delete this movie?');">
+            <button type="submit" class="mh-danger">🗑 Delete</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <p class="mh-empty">You haven't added any movies yet. Click "Add Movie" to add your first movie.</p>
+    {% endfor %}
+  </main>
+
+  <p id="emptyState" class="mh-empty" hidden>No movies match your search.</p>
+
+  <!-- Add / Edit modal -->
+  <div id="movieModal" class="mh-modal-backdrop">
+    <div class="mh-modal">
+      <div class="mh-modal-head">
+        <h2 id="modalTitle">Add movie</h2>
+        <button type="button" id="closeModalBtn" class="mh-icon-btn" aria-label="Close">✕</button>
+      </div>
+
+      <form id="movieForm" method="post" action="{{ url_for('add_movie') }}">
+        <label class="mh-field">
+          <span>Title</span>
+          <input id="fieldTitle" name="title" type="text" placeholder="e.g. Spirited Away" required>
+        </label>
+
+        <div class="mh-field-row">
+          <label class="mh-field">
+            <span>Year</span>
+            <input id="fieldYear" name="year" type="text" inputmode="numeric" maxlength="4" placeholder="2001">
+          </label>
+          <label class="mh-field">
+            <span>Genre</span>
+            <input id="fieldGenre" name="genre" type="text" placeholder="Animation">
+          </label>
+        </div>
+
+        <label class="mh-field">
+          <span>Rating — <span id="ratingValue">7</span>/10</span>
+          <input id="fieldRating" name="rating" type="range" min="1" max="10" value="7">
+        </label>
+
+        <div class="mh-field">
+          <span>Poster</span>
+          <div id="posterGrid" class="mh-poster-grid"></div>
+          <input id="fieldPoster" name="poster" type="hidden" value="🎬">
+        </div>
+
+        <div class="mh-field-row mh-field-row-check">
+          <label class="mh-check">
+            <input id="fieldFavorite" name="favorite" type="checkbox">
+            ❤️ Favorite
+          </label>
+          <label class="mh-check">
+            <input id="fieldWatched" name="watched" type="checkbox">
+            ✔ Watched
+          </label>
+        </div>
+
+        <button type="submit" class="mh-save-btn" id="saveMovieBtn">Add to collection</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+{% endblock %}

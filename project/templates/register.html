@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block title %}MovieHub — Create account{% endblock %}
+
+{% block content %}
+<div class="mh-auth-wrap">
+  <div class="mh-auth-card">
+    <h1>Join MovıeHub</h1>
+    <p class="mh-auth-sub">Start your own collection in a few seconds.</p>
+
+    <form method="post" action="{{ url_for('register') }}">
+      <label class="mh-field">
+        <span>Username</span>
+        <input type="text" name="username" placeholder="Pick a username" required autofocus>
+      </label>
+      <label class="mh-field">
+        <span>Password</span>
+        <input type="password" name="password" placeholder="At least 8 characters" required minlength="8">
+      </label>
+      <label class="mh-field">
+        <span>Confirm password</span>
+        <input type="password" name="confirmation" placeholder="Type it again" required minlength="8">
+      </label>
+      <button type="submit" class="mh-save-btn">Create account</button>
+    </form>
+
+    <p class="mh-auth-switch">
+      Already have an account? <a href="{{ url_for('login') }}">Log in</a>
+    </p>
+  </div>
+</div>
+{% endblock %}

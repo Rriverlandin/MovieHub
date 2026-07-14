@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}MovieHub — Track every film you watch{% endblock %}
+
+{% block content %}
+<section class="mh-hero">
+  <div class="mh-hero-strip" aria-hidden="true"></div>
+  <span class="mh-hero-reel">🎞️</span>
+
+  <h1>Where Every Movıe Belongs.</h1>
+
+  <p>Your collection, reimagined.</p>
+
+  <div class="mh-hero-actions">
+    <a href="{{ url_for('register') }}" class="mh-btn-primary">Get Started</a>
+    <a href="{{ url_for('login') }}" class="mh-btn-secondary">Sign In</a>
+  </div>
+
+  <div class="mh-features">
+    <div class="mh-feature" style="animation-delay:0.05s">
+      <span class="mh-feature-icon">⭐</span>
+      <h3>Rate everything</h3>
+      <p>Give every movie a rating out of 10 and keep your own private scoreboard.</p>
+    </div>
+
+    <div class="mh-feature" style="animation-delay:0.12s">
+      <span class="mh-feature-icon">❤️</span>
+      <h3>Star favorites</h3>
+      <p>Mark the films you'd watch again in a heartbeat, so they're never lost in the list.</p>
+    </div>
+
+    <div class="mh-feature" style="animation-delay:0.19s">
+      <span class="mh-feature-icon">✔</span>
+      <h3>Track watched</h3>
+      <p>See at a glance what's done and what's still sitting in your watchlist.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}MovıeHub{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% block head %}{% endblock %}
+</head>
+<body>
+
+  <nav class="mh-nav">
+    <a href="{{ url_for('index') }}" class="mh-nav-brand">
+      🎬 Movıe<span class="mh-accent">Hub</span>
+    </a>
+    <div class="mh-nav-links">
+      {% if session.user_id %}
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('register') }}" class="mh-nav-cta">Get started</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="mh-toasts" id="mhToasts">
+        {% for category, message in messages %}
+          <div class="mh-toast {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+  <footer class="mh-footer">
+    MovieHub — your personal film log, built for people who actually remember what they watched.
+  </footer>
+
+  <script>
+    // auto-dismiss flash toasts
+    const toasts = document.getElementById("mhToasts");
+    if (toasts) {
+      setTimeout(() => {
+        toasts.style.transition = "opacity 0.4s ease";
+        toasts.style.opacity = "0";
+        setTimeout(() => toasts.remove(), 400);
+      }, 3200);
+    }
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
